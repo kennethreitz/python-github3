@@ -28,11 +28,12 @@ API_MIME = 'application/vnd.github.v3+json'
 # =======
 
 def _safe_response(r, error=None):
+
     try:
         r.raise_for_status()
         return r
     except requests.HTTPError:
-        if r.status_code == 401:
+        if (r.status_code == 404) or (r.status_code == 401):
             raise LoginFailed
         else:
             raise APIError(error) if error else APIError
@@ -47,6 +48,7 @@ def get(*path, **params):
     api.get('groups', 'id')
     api.get('accounts', 'verify')
     """
+
     url = '{0}{1}'.format(API_URL, '/'.join(map(str, path)))
 
     # params = kwargs.get('params', None)

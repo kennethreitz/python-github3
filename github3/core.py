@@ -22,7 +22,6 @@ class GitHub(object):
 
     def __init__(self, apiurl=API_URL):
         self.__basic_auth = None
-        return self.logged_in()
 
     def _get(self, *path):
         r = get(*path, auth=self.__basic_auth)
@@ -38,13 +37,21 @@ class GitHub(object):
 
     def auth(self, username, password):
         self.__basic_auth = (username, password)
+        return self.logged_in
 
     def oauth(self):
         # TODO: oAuth
         pass
 
+    @property
     def logged_in(self):
-        print self._get('').headers
+        r = self._get('')
+
+        # print r
+        if r.status_code == 200:
+            return True
+        else:
+            return False
 
 
 
