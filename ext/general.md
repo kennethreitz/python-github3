@@ -1,5 +1,3 @@
-<!-- https://gist.github.com/raw/71c2878f53e886dc921a/general.md -->
-
 ## GitHub API v3
 
 **Note:** This API is in a beta state.  Breaking changes may occur.
@@ -85,4 +83,4 @@ This allows us to upgrade the API if needed, and support multiple versions of th
 
 Specifying `application/json` will assume the latest version of the API.  Specifying an unknown version will result in a `406 Not Acceptable` error.
 
-We don't plan to bump the API version unless absolutely necessary.  Things like removing end points, renaming or removing object attributes, or removing resources completely will result in a new version.  This should be extremely rare, however.
+We don't plan to bump the API version unless absolutely necessary.  Things like removing end points, renaming or removing object attributes, or removing resources completely will result in a new version.  This should be extremely rare, however.  
