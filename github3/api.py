@@ -9,16 +9,19 @@
     :license: ISC, see LICENSE for more details.
 """
 
-from convore.packages.anyjson import deserialize
+from . import models
+from .packages.anyjson import deserialize
 
 import requests
 
-from . import models
 
 
 
 API_URL = 'https://api.github.com'
-AUTH = None
+API_MIME = 'application/vnd.github.v3+json'
+
+
+
 
 # =======
 # Helpers
@@ -35,7 +38,7 @@ def _safe_response(r, error=None):
             raise APIError(error) if error else APIError
 
 
-def get(*path, **kwargs):
+def get(*path, **params):
     """
     Accepts optional error parameter, which will be passed in the event of a
     non-401 HTTP error.
@@ -44,14 +47,13 @@ def get(*path, **kwargs):
     api.get('groups', 'id')
     api.get('accounts', 'verify')
     """
-    url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
+    url = '{0}{1}'.format(API_URL, '/'.join(map(str, path)))
 
-    params = kwargs.get('params', None)
+    # params = kwargs.get('params', None)
 
-    r = requests.get(url, params=params, auth=auth)
+    r = requests.get(url, params=params, auth=None)
 
-    error = kwargs.get('error', None)
-    return _safe_response(r, error)
+    return _safe_response(r)
 
 
 def post(params, *path):
