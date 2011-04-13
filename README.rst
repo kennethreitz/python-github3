@@ -7,12 +7,19 @@ This is going to be awesome.
 
 
 
-Dependencies
-------------
+Usage
+-----
 
-- Requests
-- AnyJSON
-- OrderedDict
+::
+    from github3 import github
+
+    github.login('username', 'password')
+    # optional
+
+    github.
+
+
+
 
 
 Installation
