@@ -4,7 +4,8 @@
 import os
 import sys
 
-from distutils.core import setup
+# from distutils.core import setup
+from setuptools import setup, find_packages
 
 import clint
 
@@ -18,21 +19,17 @@ if sys.argv[-1] == "publish":
     publish()
     sys.exit()
 
-required = []
+required = ['requests==0.3.1']
 
 setup(
     name='github3',
-    version='0.0.0',
-    description='[placeholder] Python wrapper for the github v3 api!',
-    long_description='\n\n',
+    version='0.0.1',
+    description='Python wrapper for the github v3 api!',
+    long_description=open('README.rst').read(),
     author='Kenneth Reitz',
     author_email='me@kennethreitz.com',
     url='https://github.com/kennethreitz/python-github3',
-    packages= [
-        'clint',
-        'clint.textui',
-        'clint.packages', 'clint.packages.colorama'
-    ],
+    packages= find_packages('github3'),
     install_requires=required,
     license='ISC',
     classifiers=(
