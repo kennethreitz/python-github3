@@ -46,8 +46,8 @@ class GitHub(object):
     @property
     def logged_in(self):
         r = self._get('')
+        print
 
-        # print r
         if r.status_code == 200:
             return True
         else:

@@ -9,8 +9,14 @@ This module provides the GitHub3 object models.
 """
 
 
+class GitHubModel(object):
 
-class User(object):
+    def __init__(self):
+        pass
+
+
+
+class User(GitHubModel):
     pass
 
     def __init__(self):
@@ -25,31 +31,31 @@ class User(object):
 
 
 
-class Repo(object):
+class Repo(GitHubModel):
     """GitHub Repository."""
     pass
 
 
 
-class Gist(object):
+class Gist(GitHubModel):
     """GitHub Gist.
 
     gist.files['filename.py']
     """
 
     def __init__(self):
-        pass
+        self.api_url = None
 
 
 
-class GistComment(object):
+class GistComment(GitHubModel):
     """GitHub GistComment."""
 
     def __init__(self):
         pass
 
 
-class Issue(object):
+class Issue(GitHubModel):
 
 
     def __init__(self):
@@ -66,13 +72,13 @@ class Issue(object):
         self.api_url = None
 
         # api
-        self.milestone
-        self.assignee
+        self.milestone = None
+        self.assignee = None
 
 
 
-class Milestone(object):
+class Milestone(GitHubModel):
 
-
-    def __init__(self):pass
+    def __init__(self):
+        self.api_url = None
 
