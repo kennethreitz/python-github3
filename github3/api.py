@@ -49,8 +49,11 @@ def get(*path, **params):
     api.get('accounts', 'verify')
     """
 
-    url = '{0}{1}'.format(API_URL, '/'.join(map(str, path)))
+    path = list(path)
+    path.insert(0, '')
 
+    url = '{0}{1}'.format(API_URL, '/'.join(map(str, path)))
+    print url
     # params = kwargs.get('params', None)
 
     r = requests.get(url, params=params, auth=None)
@@ -60,7 +63,8 @@ def get(*path, **params):
 
 def post(params, *path):
 
-    url =  '%s%s%s' % (API_URL, '/'.join(map(str, path)), '.json')
+    path += API_URL
+    url =  '%s%s' % ('/'.join(map(str, path)), '.json')
     r = requests.post(url, params=params, auth=auth)
     return _safe_response(r)
 

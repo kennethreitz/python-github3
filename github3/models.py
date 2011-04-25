@@ -31,6 +31,9 @@ class User(GitHubModel):
         self.company = None,
         self.location = None
 
+    def __repr__(self):
+        return '<user \'{0}\''.format(self.name)
+
     def from_dict(self, d):
         self.email = d.get('email', None),
         self.type = d.get('type', None),
@@ -73,6 +76,9 @@ class Repo(GitHubModel):
         self.owner = None,
         self.name = None
 
+    def __repr__(self):
+        return '<repo \'{0}/{1}\''.format(self.owner, self.name)
+
     def from_dict(self, d):
         self.has_downloads = d.get('has_downloads', None),
         self.forks = d.get('forks', None),
@@ -92,7 +98,8 @@ class Repo(GitHubModel):
         self.private = d.get('private', None),
         self.size = d.get('size', None),
         self.integrate_branch = d.get('integrate_branch', None),
-        self.owner = d.get('owner', None),
+        self.owner = User()
+        self.owner.from_dict(d.get('owner', dict()))
         self.name = d.get('name', None),
 
 
