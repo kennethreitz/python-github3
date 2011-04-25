@@ -19,15 +19,18 @@ class GitHub(object):
     rate_limit = None
     rate_left = None
     per_page = 30
+    accept = 'application/vnd.github.v3+json'
 
     def __init__(self, apiurl=API_URL):
         self.__basic_auth = None
 
     def _get(self, *path):
-        r = get(*path, auth=self.__basic_auth)
+        headers = {'Accept': self.accept}
 
-        rate_limit = r.headers.get('x-ratelimit-remaining', None)
-        rate_left = r.headers.get('x-ratelimit-limit', None)
+        r = get(*path, auth=self.__basic_auth, headers=headers)
+
+        rate_left = r.headers.get('x-ratelimit-remaining', None)
+        rate_limit = r.headers.get('x-ratelimit-limit', None)
 
         if (rate_limit is not None) or (rate_left is not None):
             self.rate_limit = rate_limit
@@ -48,7 +51,7 @@ class GitHub(object):
         r = self._get('')
         print
 
-        if r.status_code == 200:
+        if r.status_code == 200 and self.__basic_auth:
             return True
         else:
             return False
