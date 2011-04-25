@@ -24,6 +24,7 @@ class GitHub(object):
     def __init__(self, apiurl=API_URL):
         self.__basic_auth = None
 
+
     def _get(self, *path):
         headers = {'Accept': self.accept}
 
@@ -38,13 +39,17 @@ class GitHub(object):
 
         return r
 
+
+
     def auth(self, username, password):
         self.__basic_auth = (username, password)
         return self.logged_in
 
+
     def oauth(self):
         # TODO: oAuth
         pass
+
 
     @property
     def logged_in(self):
