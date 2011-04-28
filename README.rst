@@ -3,7 +3,7 @@ Github3: Python wrapper for the (new) GitHub API v3
 
 Github's working on a new API. This is the new Python wrapper for it.
 
-This is going to be awesome.
+**This a work in progress.** Should be relased before the first week of May.
 
 
 
