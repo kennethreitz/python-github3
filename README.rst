@@ -11,6 +11,7 @@ Usage
 -----
 
 ::
+
     from github3 import github
 
     github.login('username', 'password')
