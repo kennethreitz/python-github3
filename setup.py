@@ -20,7 +20,7 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 with open('reqs.txt') as f:
-    required = f.readlines()
+    required = map(str.rstrip, f.readlines())
 
 setup(
     name='github3',
