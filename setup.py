@@ -4,22 +4,23 @@
 import os
 import sys
 
-# from distutils.core import setup
-from setuptools import setup, find_packages
-
-import clint
-
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup, find_packages
 
 
 def publish():
     """Publish to PyPi"""
-    os.system("python setup.py sdist upload")
+    os.system('python setup.py sdist upload')
 
-if sys.argv[-1] == "publish":
+
+if sys.argv[-1] == 'publish':
     publish()
     sys.exit()
 
-required = ['requests==0.3.1']
+with open('reqs.txt') as f:
+    required = f.readlines()
 
 setup(
     name='github3',
@@ -29,7 +30,7 @@ setup(
     author='Kenneth Reitz',
     author_email='me@kennethreitz.com',
     url='https://github.com/kennethreitz/python-github3',
-    packages= find_packages('github3'),
+    packages=find_packages(exclude='docs'),
     install_requires=required,
     license='ISC',
     classifiers=(
@@ -38,7 +39,7 @@ setup(
         'Natural Language :: English',
         'License :: OSI Approved :: ISC License (ISCL)',
         'Programming Language :: Python',
-        # 'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         # 'Programming Language :: Python :: 3.0',
