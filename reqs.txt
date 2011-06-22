@@ -1,2 +1,1 @@
 requests==0.5.0
-omnijson==0.1.2
