@@ -10,10 +10,9 @@ This module provies the core GitHub3 API interface.
 import omnijson as json
 
 from .helpers import is_collection, to_python, to_api, get_scope
+from .config import settings
 
-def GithubCore(object):
-    pass
-
+class GithubCore(object):
 
     @staticmethod
     def _resource_serialize(o):
