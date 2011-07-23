@@ -14,8 +14,7 @@ Usage
 
     import github3
 
-    gh = github3.basic_auth('username', password)
-    # optional
+    gh = github3.basic_auth('username', 'password')
 
     gh.get_repo('kennethreitz', 'python-github3')
 
