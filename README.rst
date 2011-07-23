@@ -12,12 +12,12 @@ Usage
 
 ::
 
-    from github3 import github
+    import github3
 
-    github.login('username', 'password')
+    gh = github3.basic_auth('username', password)
     # optional
 
-    github.
+    gh.get_repo('kennethreitz', 'python-github3')
 
 
 
