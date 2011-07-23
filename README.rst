@@ -1,9 +1,9 @@
 Github3: Python wrapper for the (new) GitHub API v3
 ===================================================
 
-Github's working on a new API. This is the new Python wrapper for it.
+Github has a new API. This is the best Python wrapper for it.
 
-**This a work in progress.** Should be relased eventually.
+**This a work in progress.** Should be relased soon.
 
 
 
@@ -25,7 +25,7 @@ Usage
 Installation
 ------------
 
-To install clint, simply: ::
+To install Github3, simply: ::
 
     $ pip install github3
 
