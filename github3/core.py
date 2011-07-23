@@ -11,6 +11,8 @@ __version__ = '0.0.0'
 __license__ = 'MIT'
 __author__ = 'Kenneth Reitz'
 
+from .api import Github, settings
+
 
 def no_auth():
     """Returns an un-authenticated Github object."""
