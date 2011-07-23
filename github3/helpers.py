@@ -45,7 +45,8 @@ def to_python(obj, in_dict, string_keys=None, date_keys=None, object_map=None, *
         for in_key in date_keys:
             in_date = in_dict.get(in_key)
             try:
-                out_date = datetime.strptime(in_date, '%Y-%m-%d %H:%M:%S')
+                # TODO: Fix date formatting.
+                out_date = datetime.strptime(in_date, '%Y-%m-%dT%H:%M:%SZ')
             except TypeError:
                 out_date = None
 
