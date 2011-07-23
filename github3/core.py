@@ -16,9 +16,15 @@ from .api import Github, settings
 
 def no_auth():
     """Returns an un-authenticated Github object."""
-    pass
+
+    gh = Github()
+
+    return gh
 
 
 def basic_auth():
     """Returns an authenticated Github object, via HTTP Basic."""
-    pass
+
+    gh = Github()
+
+    return gh
