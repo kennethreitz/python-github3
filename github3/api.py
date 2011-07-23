@@ -9,8 +9,13 @@ This module provies the core GitHub3 API interface.
 
 import omnijson as json
 
+from .models import *
 from .helpers import is_collection, to_python, to_api, get_scope
 from .config import settings
+
+
+import requests
+
 
 class GithubCore(object):
 
@@ -30,49 +35,54 @@ class GithubCore(object):
             raise ResponseError('The API Response was not valid.')
 
 
+    @staticmethod
+    def _generate_url(endpoint):
+        """Generates proper endpoint URL."""
+
+        if is_collection(endpoint):
+            resource = map(str, endpoint)
+            resource = '/'.join(endpoint)
+        else:
+            resource = endpoint
+
+        return (settings.base_url + resource)
+
+
+    def _get_http_resource(self, endpoint, params=None):
+
+        url = self._generate_url(endpoint)
+        r = requests.get(url, params=params)
+        r.raise_for_status()
+
+        return r
+
+
+
+    def _get_resource(self, resource, obj, **kwargs):
+
+        r = self._get_http_resource(resource, params=kwargs)
+        item = self._resource_deserialize(r.content)
+
+        return obj.new_from_dict(item, gh=self)
+
+
     def _to_map(self, obj, iterable):
         """Maps given dict iterable to a given Resource object."""
 
-        a = []
+        a = list()
 
         for it in iterable:
             a.append(obj.new_from_dict(it, rdd=self))
 
         return a
 
+    def _get_url(self, resource):
 
-    def _get_resources(self, key, obj, limit=None, **kwargs):
-        """GETs resources of given path, maps them to objects, and
-        handles paging.
-        """
-        pass
+        if is_collection(resource):
+            resource = map(str, resource)
+            resource = '/'.join(resource)
 
-
-    def _get_resource(self, http_resource, obj, **kwargs):
-        """GETs API Resource of given path."""
-
-        item = self._get_http_resource(http_resource, params=kwargs)
-        item = self._resource_deserialize(item)
-
-        return obj.new_from_dict(item, rdd=self)
-
-
-    def _post_resource(self, http_resource, **kwargs):
-        """POSTs API Resource of given path."""
-
-        r = self._post_http_resource(http_resource, params=kwargs)
-
-        return r
-
-    def _delete_resource(self, http_resource):
-        """DELETEs API Resource of given path."""
-
-        r = self._delete_http_resource(http_resource)
-
-        if r['status'] in ('200', '204'):
-            return True
-        else:
-            return False
+        return resource
 
 
 
@@ -81,6 +91,12 @@ class Github(GithubCore):
 
     def __init__(self):
         super(Github, self).__init__()
+
+
+    def get_user(self, username):
+        # return 'kennethreitz'
+        return self._get_resource(('users', username), User)
+        # return User()
 
 
 
