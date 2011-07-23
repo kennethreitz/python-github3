@@ -55,3 +55,4 @@ class Settings(object):
 
 settings = Settings()
 settings.verbose = False
+settings.base_url = 'https://api.github.com/'
