@@ -26,7 +26,13 @@ def is_collection(obj):
 
 
 # from arc90/python-readability-api
-def to_python(obj, in_dict, string_keys=None, date_keys=None, object_map=None, **kwargs):
+def to_python(obj,
+    in_dict,
+    str_keys=None,
+    date_keys=None,
+    int_keys=None,
+    object_map=None,
+    bool_keys=None, **kwargs):
     """Extends a given object for API Consumption.
 
     :param obj: Object to extend.
@@ -36,9 +42,8 @@ def to_python(obj, in_dict, string_keys=None, date_keys=None, object_map=None, *
     :param object_map: Dict of {key, obj} map, for nested object results.
     """
 
-    if string_keys:
-        for in_key in string_keys:
-            # print in_key
+    if str_keys:
+        for in_key in str_keys:
             obj.__dict__[in_key] = in_dict.get(in_key)
 
     if date_keys:
@@ -52,6 +57,14 @@ def to_python(obj, in_dict, string_keys=None, date_keys=None, object_map=None, *
 
             obj.__dict__[in_key] = out_date
 
+    if int_keys:
+        for in_key in int_keys:
+            obj.__dict__[in_key] = int(in_dict.get(in_key))
+
+    if bool_keys:
+        for in_key in bool_keys:
+            obj.__dict__[in_key] = bool(in_dict.get(in_key))
+
     if object_map:
 
         for (k, v) in object_map.items():
@@ -63,7 +76,7 @@ def to_python(obj, in_dict, string_keys=None, date_keys=None, object_map=None, *
 
 
 # from arc90/python-readability-api
-def to_api(in_dict, int_keys=None, date_keys=None):
+def to_api(in_dict, int_keys=None, date_keys=None, bool_keys=None):
     """Extends a given object for API Production."""
 
     # Cast all int_keys to int()

@@ -11,10 +11,10 @@ from .helpers import to_python, to_api
 class BaseResource(object):
     """A BaseResource object."""
 
-    _strings = []
+    _strs = []
     _ints = []
-    _datetimes = []
-    _booleans = []
+    _dates = []
+    _bools = []
     _map = {}
 
 
@@ -37,16 +37,19 @@ class BaseResource(object):
     def _bootstrap(self):
         """Bootstraps the model object based on configured values."""
 
-        for attr in (self._strings + self._ints + self._datetimes + self._booleans + self._map.keys()):
+        for attr in (self._strs + self._ints + self._dates + self._bools + self._map.keys()):
             setattr(self, attr, None)
+
 
     @classmethod
     def new_from_dict(cls, d, gh=None):
 
         return to_python(
             obj=cls(), in_dict=d,
-            string_keys = cls._strings,
+            str_keys = cls._strings,
+            int_keys = cls._ints,
             date_keys = cls._datetimes,
+            bool_keys = cls._booleans,
             _gh = gh
         )
 
