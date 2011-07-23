@@ -37,8 +37,8 @@ But, you really shouldn't do that.
 
 
 
-License:
---------
+License
+-------
 
 ISC License. ::
 
