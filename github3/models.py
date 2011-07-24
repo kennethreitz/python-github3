@@ -92,7 +92,7 @@ class User(BaseResource):
 
     def repos(self):
          # return self._gh.get_repos(username=self.login)
-         repos = self._gh._get_resources(('users', self.login, 'repos'), Repo, authed=False)
+         repos = self._gh._get_resources(('users', self.login, 'repos'), Repo)
          return repos
 
 

@@ -140,7 +140,7 @@ class Github(GithubCore):
 
     def get_user(self, username):
         """Get a single user."""
-        return self._get_resource(('users', username), User, authed=False)
+        return self._get_resource(('users', username), User)
 
 
     def get_me(self):
@@ -153,7 +153,7 @@ class Github(GithubCore):
 
     def get_repo(self, username, reponame):
         """Get the authenticated user."""
-        return self._get_resource(('repos', username, reponame), Repo, authed=False)
+        return self._get_resource(('repos', username, reponame), Repo)
 
 
 
