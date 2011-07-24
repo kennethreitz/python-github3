@@ -77,32 +77,48 @@ class Plan(BaseResource):
 class User(BaseResource):
     """Github User object model."""
 
-    _strings = [
+    _strs = [
         'login','gravatar_url', 'url', 'name', 'company', 'blog', 'location',
         'email', 'bio', 'html_url']
 
     _ints = ['id', 'public_repos', 'public_gists', 'followers', 'following']
     _dates = ['created_at',]
     _bools = ['hireable', ]
-    _map = {}
-    _writeable = []
+    # _map = {}
+    # _writeable = []
 
     def __repr__(self):
         return '<user {0}>'.format(self.login)
 
+    def repos(self):
+         # return self._gh.get_repos(username=self.login)
+         repos = self._gh._get_resources(('users', self.login, 'repos'), Repo, authed=False)
+         return repos
 
-class CurrentUser(BaseResource):
+
+class CurrentUser(User):
     """Github Current User object model."""
 
-    _strings = [
-        'login','gravatar_url', 'url', 'name', 'company', 'blog', 'location',
-        'email', 'bio', 'html_url']
-
-    _ints = ['id', 'public_repos', 'public_gists', 'followers', 'following', 'total_private_repos', 'owned_private_repos', 'private_gists', 'disk_usage', 'collaborators']
-    _dates = ['created_at',]
-    _bools = ['hireable', ]
+    _ints = [
+        'id', 'public_repos', 'public_gists', 'followers', 'following',
+        'total_private_repos', 'owned_private_repos', 'private_gists',
+        'disk_usage', 'collaborators']
     _map = {'plan': Plan}
     _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
 
     def __repr__(self):
         return '<current-user {0}>'.format(self.login)
+
+
+class Repo(BaseResource):
+    _strs = [
+        'url', 'html_url', 'clone_url', 'git_url', 'ssh_url', 'svn_url',
+        'name', 'description', 'homepage', 'language', 'master_branch']
+    _bools = ['private', 'fork']
+    _ints = ['forks', 'watchers', 'size',]
+    _dates = ['pushed_at', 'created_at']
+    _map = {'owner': User}
+
+    def __repr__(self):
+        return '<repo {0}/{1}>'.format(self.owner.login, self.name)
+    # owner
