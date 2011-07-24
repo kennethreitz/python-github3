@@ -16,6 +16,7 @@ class BaseResource(object):
     _dates = []
     _bools = []
     _map = {}
+    _writeable = []
 
 
     def __init__(self):
@@ -53,17 +54,25 @@ class BaseResource(object):
             _gh = gh
         )
 
+    def update(self):
+        pass
+
+    def setattr(self, k, v):
+        # TODO: when writable key changed,
+        pass
 
 class User(BaseResource):
     """Github User object model."""
 
-    _strings = ['login', 'gravatar_url', 'url', 'name', 'company',
-        'blog', 'location', 'email', 'bio', 'html_url']
+    _strings = [
+        'login','gravatar_url', 'url', 'name', 'company', 'blog', 'location',
+        'email', 'bio', 'html_url']
 
     _ints = ['id', 'public_repos', 'public_gists', 'followers', 'following']
     _datetimes = ['created_at',]
     _booleans = ['hireable', ]
     _map = {}
+    _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
 
 
     def __init__(self):
@@ -71,3 +80,22 @@ class User(BaseResource):
 
     def __repr__(self):
         return '<user {0}>'.format(self.login)
+
+
+    def _update(self):
+        """Update the authenticated user."""
+
+        # TODO: check that user is authenticated
+
+        args = to_api(
+            dict(
+                favorite=self.favorite,
+                archive=self.archive,
+                read_percent=self.read_percent,
+            ),
+            int_keys=('favorite', 'archive')
+        )
+
+        r = self._rdd._post_resource(('bookmarks', self.id), **args)
+
+        return r
