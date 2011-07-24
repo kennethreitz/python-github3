@@ -50,7 +50,6 @@ def to_python(obj,
         for in_key in date_keys:
             in_date = in_dict.get(in_key)
             try:
-                # TODO: Fix date formatting.
                 out_date = datetime.strptime(in_date, '%Y-%m-%dT%H:%M:%SZ')
             except TypeError:
                 out_date = None
