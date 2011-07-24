@@ -7,7 +7,7 @@ github3.api
 This module provies the core GitHub3 API interface.
 """
 
-import omnijson as json
+from .packages import omnijson as json
 
 from .models import *
 from .helpers import is_collection, to_python, to_api, get_scope
@@ -82,7 +82,7 @@ class GithubCore(object):
         r = requests.request(*args, **kwargs)
         r = self._requests_post_hook(r)
 
-        print self._ratelimit_remaining
+        # print self._ratelimit_remaining
 
         r.raise_for_status()
 
