@@ -8,6 +8,7 @@ This module provies the core GitHub3 API interface.
 """
 
 from .packages import omnijson as json
+from .packages.link_header import parse_link_value
 
 from .models import *
 from .helpers import is_collection, to_python, to_api, get_scope
