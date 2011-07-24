@@ -83,9 +83,7 @@ class User(BaseResource):
 
 
     def _update(self):
-        """Update the authenticated user."""
-
-        # TODO: check that user is authenticated
+        """Update the User."""
 
         args = to_api(
             dict(
