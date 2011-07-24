@@ -17,6 +17,7 @@ class BaseResource(object):
     _bools = []
     _map = {}
     _writeable = []
+    _modified = []
 
 
     def __init__(self):
@@ -47,10 +48,11 @@ class BaseResource(object):
 
         return to_python(
             obj=cls(), in_dict=d,
-            str_keys = cls._strings,
+            str_keys = cls._strs,
             int_keys = cls._ints,
-            date_keys = cls._datetimes,
-            bool_keys = cls._booleans,
+            date_keys = cls._dates,
+            bool_keys = cls._bools,
+            object_map = cls._map,
             _gh = gh
         )
 
@@ -61,6 +63,17 @@ class BaseResource(object):
         # TODO: when writable key changed,
         pass
 
+class Plan(BaseResource):
+    """Github Plan object model."""
+
+    _strs = ['name']
+    _ints = ['space', 'collaborators', 'private_repos']
+
+    def __repr__(self):
+        return '<plan {0}>'.format(str(self.name))
+
+
+
 class User(BaseResource):
     """Github User object model."""
 
@@ -69,31 +82,43 @@ class User(BaseResource):
         'email', 'bio', 'html_url']
 
     _ints = ['id', 'public_repos', 'public_gists', 'followers', 'following']
-    _datetimes = ['created_at',]
-    _booleans = ['hireable', ]
+    _dates = ['created_at',]
+    _bools = ['hireable', ]
     _map = {}
     _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
-
-
-    def __init__(self):
-        super(User, self).__init__()
 
     def __repr__(self):
         return '<user {0}>'.format(self.login)
 
 
-    def _update(self):
-        """Update the User."""
+class User(BaseResource):
+    """Github User object model."""
 
-        args = to_api(
-            dict(
-                favorite=self.favorite,
-                archive=self.archive,
-                read_percent=self.read_percent,
-            ),
-            int_keys=('favorite', 'archive')
-        )
+    _strings = [
+        'login','gravatar_url', 'url', 'name', 'company', 'blog', 'location',
+        'email', 'bio', 'html_url']
 
-        r = self._rdd._post_resource(('bookmarks', self.id), **args)
+    _ints = ['id', 'public_repos', 'public_gists', 'followers', 'following', 'total_private_repos', 'owned_private_repos', 'private_gists', 'disk_usage', 'collaborators']
+    _dates = ['created_at',]
+    _bools = ['hireable', ]
+    _map = {'plan': Plan}
+    _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
 
-        return r
+    def __repr__(self):
+        return '<user {0}>'.format(self.login)
+
+    # def _update(self):
+    #     """Update the User."""
+
+    #     args = to_api(
+    #         dict(
+    #             favorite=self.favorite,
+    #             archive=self.archive,
+    #             read_percent=self.read_percent,
+    #         ),
+    #         int_keys=('favorite', 'archive')
+    #     )
+
+    #     r = self._rdd._post_resource(('bookmarks', self.id), **args)
+
+    #     return r
