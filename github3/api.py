@@ -21,6 +21,10 @@ from decorator import decorator
 
 class GithubCore(object):
 
+    _rate_limit = None
+    _rate_limit_remaining = None
+
+
     @staticmethod
     def _resource_serialize(o):
         """Returns JSON serialization of given object."""
@@ -51,7 +55,18 @@ class GithubCore(object):
 
 
     def _requests_pre_hook(*args, **kwargs):
+        """Pre-processing for HTTP requests arguments."""
+
         return args, kwargs
+
+
+    def _requests_post_hook(self, r):
+        """Post-processing for HTTP response objects."""
+
+        self._ratelimit = int(r.headers.get('x-ratelimit-limit', -1))
+        self._ratelimit_remaining = int(r.headers.get('x-ratelimit-remaining', -1))
+
+        return r
 
 
     def _http_resource(self, verb, endpoint, params=None, authed=True):
@@ -65,6 +80,9 @@ class GithubCore(object):
             kwargs = {'params': params}
 
         r = requests.request(*args, **kwargs)
+        r = self._requests_post_hook(r)
+
+        print self._ratelimit_remaining
 
         r.raise_for_status()
 
@@ -77,6 +95,19 @@ class GithubCore(object):
         item = self._resource_deserialize(r.content)
 
         return obj.new_from_dict(item, gh=self)
+
+
+    def _get_resources(self, resource, obj, authed=True, **kwargs):
+
+        r = self._http_resource('GET', resource, params=kwargs, authed=authed)
+        d_items = self._resource_deserialize(r.content)
+
+        items = []
+
+        for item in d_items:
+            items.append(obj.new_from_dict(item, gh=self))
+
+        return items
 
 
     def _to_map(self, obj, iterable):
@@ -115,6 +146,14 @@ class Github(GithubCore):
     def get_me(self):
         """Get the authenticated user."""
         return self._get_resource(('user'), CurrentUser)
+
+    # def get_repos(self, username):
+        # """Get repos."""
+         # return self._get_resource(('user', 'username', 'repos'), Repo)
+
+    def get_repo(self, username, reponame):
+        """Get the authenticated user."""
+        return self._get_resource(('repos', username, reponame), Repo, authed=False)
 
 
 
