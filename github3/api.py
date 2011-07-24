@@ -95,9 +95,14 @@ class Github(GithubCore):
 
     def get_user(self, username):
         # return 'kennethreitz'
+        """Get a single user."""
         return self._get_resource(('users', username), User)
         # return User()
 
+
+    def get_me(self):
+        """Get the authenticated user."""
+        return self._get_resource(('users'), User)
 
 
 
