@@ -114,7 +114,7 @@ class Github(GithubCore):
 
     def get_me(self):
         """Get the authenticated user."""
-        return self._get_resource(('user'), User)
+        return self._get_resource(('user'), CurrentUser)
 
 
 

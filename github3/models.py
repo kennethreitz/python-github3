@@ -85,14 +85,14 @@ class User(BaseResource):
     _dates = ['created_at',]
     _bools = ['hireable', ]
     _map = {}
-    _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
+    _writeable = []
 
     def __repr__(self):
         return '<user {0}>'.format(self.login)
 
 
-class User(BaseResource):
-    """Github User object model."""
+class CurrentUser(BaseResource):
+    """Github Current User object model."""
 
     _strings = [
         'login','gravatar_url', 'url', 'name', 'company', 'blog', 'location',
@@ -105,20 +105,4 @@ class User(BaseResource):
     _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
 
     def __repr__(self):
-        return '<user {0}>'.format(self.login)
-
-    # def _update(self):
-    #     """Update the User."""
-
-    #     args = to_api(
-    #         dict(
-    #             favorite=self.favorite,
-    #             archive=self.archive,
-    #             read_percent=self.read_percent,
-    #         ),
-    #         int_keys=('favorite', 'archive')
-    #     )
-
-    #     r = self._rdd._post_resource(('bookmarks', self.id), **args)
-
-    #     return r
+        return '<current-user {0}>'.format(self.login)
