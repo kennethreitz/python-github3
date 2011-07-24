@@ -58,16 +58,18 @@ def to_python(obj,
 
     if int_keys:
         for in_key in int_keys:
-            obj.__dict__[in_key] = int(in_dict.get(in_key))
+            if (in_dict is not None) and (in_dict.get(in_key) is not None):
+                obj.__dict__[in_key] = int(in_dict.get(in_key))
 
     if bool_keys:
         for in_key in bool_keys:
-            obj.__dict__[in_key] = bool(in_dict.get(in_key))
+            if in_dict.get(in_key) is not None:
+                obj.__dict__[in_key] = bool(in_dict.get(in_key))
 
     if object_map:
-
         for (k, v) in object_map.items():
-            obj.__dict__[k] = v.new_from_dict(in_dict.get(k))
+            if in_dict.get(k):
+                obj.__dict__[k] = v.new_from_dict(in_dict.get(k))
 
     obj.__dict__.update(kwargs)
 
