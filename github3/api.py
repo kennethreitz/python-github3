@@ -16,6 +16,8 @@ from .config import settings
 
 import requests
 
+from decorator import decorator
+
 
 class GithubCore(object):
 
@@ -52,29 +54,26 @@ class GithubCore(object):
         return args, kwargs
 
 
-    def _get_http_resource(self, endpoint, params=None):
+    def _http_resource(self, verb, endpoint, params=None, authed=True):
 
         url = self._generate_url(endpoint)
 
-        args, kwargs = self._requests_pre_hook(url, params=params)
-        r = requests.get(*args, **kwargs)
+        if authed:
+            args, kwargs = self._requests_pre_hook(verb, url, params=params)
+        else:
+            args = (verb, url)
+            kwargs = {'params': params}
+
+        r = requests.request(*args, **kwargs)
 
         r.raise_for_status()
 
         return r
 
-    def _patch_http_resource(self, endpoint, params=None):
 
-        url = self._generate_url(endpoint)
-        r = requests.patch(url, params=params)
-        r.raise_for_status()
+    def _get_resource(self, resource, obj, authed=True, **kwargs):
 
-        return r
-
-
-    def _get_resource(self, resource, obj, **kwargs):
-
-        r = self._get_http_resource(resource, params=kwargs)
+        r = self._http_resource('GET', resource, params=kwargs, authed=authed)
         item = self._resource_deserialize(r.content)
 
         return obj.new_from_dict(item, gh=self)
@@ -105,11 +104,12 @@ class Github(GithubCore):
 
     def __init__(self):
         super(Github, self).__init__()
+        self.is_authenticated = False
 
 
     def get_user(self, username):
         """Get a single user."""
-        return self._get_resource(('users', username), User)
+        return self._get_resource(('users', username), User, authed=False)
 
 
     def get_me(self):

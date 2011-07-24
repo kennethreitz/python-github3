@@ -30,6 +30,7 @@ def basic_auth(username, password):
         return args, kwargs
 
     gh = Github()
+    gh.is_authenticated = True
     gh._requests_pre_hook = enable_auth
 
     return gh
