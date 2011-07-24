@@ -48,14 +48,28 @@ class GithubCore(object):
         return (settings.base_url + resource)
 
 
+    def _requests_pre_hook(*args, **kwargs):
+        return args, kwargs
+
+
     def _get_http_resource(self, endpoint, params=None):
 
         url = self._generate_url(endpoint)
-        r = requests.get(url, params=params)
+
+        args, kwargs = self._requests_pre_hook(url, params=params)
+        r = requests.get(*args, **kwargs)
+
         r.raise_for_status()
 
         return r
 
+    def _patch_http_resource(self, endpoint, params=None):
+
+        url = self._generate_url(endpoint)
+        r = requests.patch(url, params=params)
+        r.raise_for_status()
+
+        return r
 
 
     def _get_resource(self, resource, obj, **kwargs):
@@ -94,15 +108,13 @@ class Github(GithubCore):
 
 
     def get_user(self, username):
-        # return 'kennethreitz'
         """Get a single user."""
         return self._get_resource(('users', username), User)
-        # return User()
 
 
     def get_me(self):
         """Get the authenticated user."""
-        return self._get_resource(('users'), User)
+        return self._get_resource(('user'), User)
 
 
 

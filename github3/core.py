@@ -22,9 +22,14 @@ def no_auth():
     return gh
 
 
-def basic_auth():
+def basic_auth(username, password):
     """Returns an authenticated Github object, via HTTP Basic."""
 
+    def enable_auth(*args, **kwargs):
+        kwargs['auth'] = (username, password)
+        return args, kwargs
+
     gh = Github()
+    gh._requests_pre_hook = enable_auth
 
     return gh
