@@ -63,6 +63,7 @@ class BaseResource(object):
         # TODO: when writable key changed,
         pass
 
+
 class Plan(BaseResource):
     """Github Plan object model."""
 
@@ -121,4 +122,45 @@ class Repo(BaseResource):
 
     def __repr__(self):
         return '<repo {0}/{1}>'.format(self.owner.login, self.name)
-    # owner
+
+    def issues(self):
+        issues = self._gh._get_resources(('repos', self.owner.login,
+             self.name, 'issues'), Issue)
+        return issues
+
+
+class IssueLabel(BaseResource):
+    _strs = ['url', 'name', 'color']
+
+    def __repr__(self):
+        return '<label {0}>'.format(self.name)
+
+
+class Milestone(BaseResource):
+    _strs = ['url', 'state', 'title', 'description']
+    _ints = ['number', 'open_issues', 'closed_issues']
+    _dates = ['created_at', 'due_on']
+    _map = {'creator': User}
+
+    def __repr__(self):
+        return '<milestone {0}-{1}>'.format(self.number, self.title)
+
+
+class Issue(BaseResource):
+    _map = {'assignee': User, 'user': User, 'milestone': Milestone,
+            'labels': IssueLabel}
+    _ints = ['number', 'comments']
+    _strs = ['url', 'html_url', 'body', 'title', 'state']
+    _dates = ['closed_at', 'created_at', 'updated_at']
+
+    @property
+    def repo_user(self):
+        return self.url.split('/')[-4]
+
+    @property
+    def repo_name(self):
+        return self.url.split('/')[-3]
+
+    def __repr__(self):
+        return '<issue {0}/{1}-{2}>'.format(self.repo_user, self.repo_name,
+                                            self.number)

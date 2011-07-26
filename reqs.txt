@@ -1,1 +1,3 @@
 requests==0.5.1
+decorator==3.3.1
+DateUtils==0.5.1

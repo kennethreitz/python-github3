@@ -76,6 +76,7 @@ class GithubCore(object):
 
         if authed:
             args, kwargs = self._requests_pre_hook(verb, url, params=params)
+            args = args[1:]
         else:
             args = (verb, url)
             kwargs = {'params': params}
@@ -156,6 +157,9 @@ class Github(GithubCore):
         """Get the authenticated user."""
         return self._get_resource(('repos', username, reponame), Repo)
 
+    def get_issues(self, username, reponame):
+        return self._get_resources(('repos', username, reponame, 'issues'),
+                Issue)
 
 
 class ResponseError(Exception):
