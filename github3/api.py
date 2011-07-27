@@ -55,9 +55,8 @@ class GithubCore(object):
         return (settings.base_url + resource)
 
 
-    def _requests_pre_hook(*args, **kwargs):
+    def _requests_pre_hook(self, *args, **kwargs):
         """Pre-processing for HTTP requests arguments."""
-
         return args, kwargs
 
 
@@ -76,7 +75,6 @@ class GithubCore(object):
 
         if authed:
             args, kwargs = self._requests_pre_hook(verb, url, params=params)
-            args = args[1:]
         else:
             args = (verb, url)
             kwargs = {'params': params}
