@@ -123,10 +123,13 @@ class Repo(BaseResource):
     def __repr__(self):
         return '<repo {0}/{1}>'.format(self.owner.login, self.name)
 
-    def issues(self):
-        issues = self._gh._get_resources(('repos', self.owner.login,
-             self.name, 'issues'), Issue)
-        return issues
+    def issues(self, **params):
+        return self._gh._get_resources(('repos', self.owner.login,
+            self.name, 'issues'), Issue, **params)
+
+    def milestones(self, **params):
+        return self._gh._get_resources(('repos', self.owner.login,
+            self.name, 'milestones'), Milestone, **params)
 
 
 class IssueLabel(BaseResource):
@@ -160,6 +163,10 @@ class Issue(BaseResource):
     @property
     def repo_name(self):
         return self.url.split('/')[-3]
+
+    @property
+    def repo_full(self):
+        return '/'.join((self.repo_user, self.repo_name))
 
     def __repr__(self):
         return '<issue {0}/{1}-{2}>'.format(self.repo_user, self.repo_name,
