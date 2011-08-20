@@ -90,10 +90,8 @@ class User(BaseResource):
     def __repr__(self):
         return '<user {0}>'.format(self.login)
 
-    def repos(self):
-         # return self._gh.get_repos(username=self.login)
-         repos = self._gh._get_resources(('users', self.login, 'repos'), Repo)
-         return repos
+    def repos(self, limit=None):
+         return self._gh._get_resources(('users', self.login, 'repos'), Repo)
 
 
 class CurrentUser(User):
@@ -108,6 +106,9 @@ class CurrentUser(User):
 
     def __repr__(self):
         return '<current-user {0}>'.format(self.login)
+
+    def repos(self, limit=None):
+         return self._gh._get_resources(('user', 'repos'), Repo)
 
 
 class Repo(BaseResource):
