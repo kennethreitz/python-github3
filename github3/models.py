@@ -97,6 +97,19 @@ class User(BaseResource):
          return repos
 
 
+class Organization(User):
+
+    _bools = []
+
+    def __repr__(self):
+        return '<org {0}>'.format(self.login)
+
+    def repos(self, repo_type="all"):
+         repos = self._gh._get_resources(('orgs', self.login, 'repos'), Repo,
+                 type=repo_type)
+         return repos
+
+
 class CurrentUser(User):
     """Github Current User object model."""
 

@@ -142,6 +142,9 @@ class Github(GithubCore):
         """Get a single user."""
         return self._get_resource(('users', username), User)
 
+    def get_org(self, orgname):
+        """Get a single organization."""
+        return self._get_resource(('orgs', orgname), Organization)
 
     def get_me(self):
         """Get the authenticated user."""
