@@ -156,6 +156,9 @@ class Github(GithubCore):
         """Get the authenticated user."""
         return self._get_resource(('repos', username, reponame), Repo)
 
+    def get_org(self, login):
+        """Get organization."""
+        return self._get_resource(('orgs', login), Org)
 
 
 class ResponseError(Exception):
