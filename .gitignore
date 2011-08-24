@@ -1,2 +1,4 @@
+*.py?
 .workon
 toy.py
+github3.egg-info/
