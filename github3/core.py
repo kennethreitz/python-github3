@@ -11,7 +11,11 @@ __version__ = '0.0.0'
 __license__ = 'MIT'
 __author__ = 'Kenneth Reitz'
 
+
+import envoy
+
 from .api import Github, settings
+
 
 
 def no_auth():
@@ -27,6 +31,27 @@ def basic_auth(username, password):
 
     def enable_auth(*args, **kwargs):
         kwargs['auth'] = (username, password)
+        return args, kwargs
+
+    gh = Github()
+    gh.is_authenticated = True
+    gh._requests_pre_hook = enable_auth
+
+    return gh
+
+
+
+def git_config():
+    """Returns an authenticated Github object, via HTTP Basic.
+
+    GitHub API token is taken from `git config`.
+    """
+
+    username = envoy.run('git config github.user').std_out.strip()
+    token = envoy.run('git config github.token').std_out.strip()
+
+    def enable_auth(*args, **kwargs):
+        kwargs['auth'] = (username, token)
         return args, kwargs
 
     gh = Github()
