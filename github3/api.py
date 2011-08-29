@@ -55,9 +55,8 @@ class GithubCore(object):
         return (settings.base_url + resource)
 
 
-    def _requests_pre_hook(*args, **kwargs):
+    def _requests_pre_hook(self, *args, **kwargs):
         """Pre-processing for HTTP requests arguments."""
-
         return args, kwargs
 
 
@@ -143,6 +142,9 @@ class Github(GithubCore):
         """Get a single user."""
         return self._get_resource(('users', username), User)
 
+    def get_org(self, orgname):
+        """Get a single organization."""
+        return self._get_resource(('orgs', orgname), Organization)
 
     def get_me(self):
         """Get the authenticated user."""
@@ -156,9 +158,9 @@ class Github(GithubCore):
         """Get the authenticated user."""
         return self._get_resource(('repos', username, reponame), Repo)
 
-    def get_org(self, login):
-        """Get organization."""
-        return self._get_resource(('orgs', login), Org)
+    def get_issues(self, username, reponame):
+        return self._get_resources(('repos', username, reponame, 'issues'),
+                Issue)
 
 
 class ResponseError(Exception):
