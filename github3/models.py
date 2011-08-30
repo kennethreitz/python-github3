@@ -176,6 +176,36 @@ class Repo(BaseResource):
         return self._gh._get_resources(('repos', self.owner.login,
             self.name, 'downloads'), Download, **params)
 
+    def create_download(self, filepath, **params):
+        import os
+        data = {'size': os.path.getsize(filepath), 'name': filepath.split('/')[-1]}
+        
+        dlressource = self._gh._post_resource(('repos', self.owner.login,
+            self.name, 'downloads'), DownloadRessource, data=self._gh._resource_serialize(data), **params)
+        
+        curl_command = list();
+        curl_command.append('curl')
+        curl_command.append('-s')
+        curl_command.append('-F key='+dlressource.path)
+        curl_command.append('-F acl='+dlressource.acl)
+        curl_command.append('-F success_action_status=201')
+        curl_command.append('-F Filename='+dlressource.name)
+        curl_command.append('-F AWSAccessKeyId='+dlressource.accesskeyid)
+        curl_command.append('-F Policy='+dlressource.policy)
+        curl_command.append('-F Signature='+dlressource.signature)
+        curl_command.append('-F Content-Type='+dlressource.mime_type)
+        curl_command.append('-F file=@'+filepath+'')
+        curl_command.append('https://github.s3.amazonaws.com/')
+        import subprocess
+        p = subprocess.Popen(curl_command,
+            env=os.environ,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        out, err = p.communicate()
+        return dlressource;
+
 
 class IssueLabel(BaseResource):
     _strs = ['url', 'name', 'color']
@@ -228,4 +258,10 @@ class Download(BaseResource):
         args = self.url.split('/')
         return self._gh._delete_resource(('repos',args[-4],args[-3],args[-2],args[-1]), Download, **params)
 
+class DownloadRessource(Download):
+    _strs = ['url', 'html_url', 'name', 'description', 'policy', 'signature', 'bucket', 'accesskeyid', 'path', 'acl', 'expirationdate', 'prefix', 'mime_type', 's3_url']
+    _ints = ['id', 'size', 'download_count']
+
+    def __repr__(self):
+        return '<DownloadRessource {1} {0}>'.format(self.id, self.name)
 
