@@ -69,21 +69,18 @@ class GithubCore(object):
         return r
 
 
-    def _http_resource(self, verb, endpoint, params=None, authed=True):
+    def _http_resource(self, verb, endpoint, data=None, params=None, authed=True):
 
         url = self._generate_url(endpoint)
-
         if authed:
-            args, kwargs = self._requests_pre_hook(verb, url, params=params)
+            args, kwargs = self._requests_pre_hook(verb, url, data=data, params=params)
         else:
             args = (verb, url)
-            kwargs = {'params': params}
-
+            kwargs = {'data': data, 'params': params}
         r = requests.request(*args, **kwargs)
         r = self._requests_post_hook(r)
 
         # print self._ratelimit_remaining
-
         r.raise_for_status()
 
         return r
@@ -116,6 +113,13 @@ class GithubCore(object):
 
         return True
 
+
+    def _post_resource(self, resource, obj, data=None, authed=True, **kwargs):
+
+        r = self._http_resource('POST', resource, data=data, params=kwargs, authed=authed)
+        item = self._resource_deserialize(r.content)
+
+        return obj.new_from_dict(item, gh=self)
 
 
     def _to_map(self, obj, iterable):
