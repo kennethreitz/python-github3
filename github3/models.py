@@ -172,6 +172,10 @@ class Repo(BaseResource):
         return self._gh._get_resources(('repos', self.owner.login,
             self.name, 'milestones'), Milestone, **params)
 
+    def downloads(self, **params):
+        return self._gh._get_resources(('repos', self.owner.login,
+            self.name, 'downloads'), Download, **params)
+
 
 class IssueLabel(BaseResource):
     _strs = ['url', 'name', 'color']
@@ -212,3 +216,16 @@ class Issue(BaseResource):
     def __repr__(self):
         return '<issue {0}/{1}-{2}>'.format(self.repo_user, self.repo_name,
                                             self.number)
+
+class Download(BaseResource):
+    _strs = ['url', 'html_url', 'name', 'description']
+    _ints = ['id', 'size', 'download_count']
+
+    def __repr__(self):
+        return '<Download {1} {0}>'.format(self.id, self.name)
+
+    def delete(self, **params):
+        args = self.url.split('/')
+        return self._gh._delete_resource(('repos',args[-4],args[-3],args[-2],args[-1]), Download, **params)
+
+

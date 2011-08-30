@@ -110,6 +110,14 @@ class GithubCore(object):
         return items
 
 
+    def _delete_resource(self, resource, authed=True, **kwargs):
+
+        r = self._http_resource('DELETE', resource, params=kwargs, authed=authed)
+
+        return True
+
+
+
     def _to_map(self, obj, iterable):
         """Maps given dict iterable to a given Resource object."""
 
