@@ -6,6 +6,8 @@ This module provides the Github3 object model.
 """
 
 from .helpers import to_python, to_api
+import os
+import magic
 from .config import settings
 import requests
 
@@ -178,8 +180,10 @@ class Repo(BaseResource):
             self.name, 'downloads'), Download, **params)
 
     def create_download(self, filepath, **params):
-        import os
-        data = {'size': os.path.getsize(filepath), 'name': filepath.split('/')[-1]}
+        m = magic.open(magic.MAGIC_MIME)
+        m.load()
+        mime_type = m.file(filepath)
+        data = {'size': os.path.getsize(filepath), 'name': filepath.split('/')[-1], 'content_type': mime_type}
         
         dlressource = self._gh._post_resource(('repos', self.owner.login,
                                                self.name, 'downloads'), 
