@@ -6,7 +6,8 @@ This module provides the Github3 object model.
 """
 
 from .helpers import to_python, to_api
-
+from .config import settings
+import requests
 
 class BaseResource(object):
     """A BaseResource object."""
@@ -181,29 +182,25 @@ class Repo(BaseResource):
         data = {'size': os.path.getsize(filepath), 'name': filepath.split('/')[-1]}
         
         dlressource = self._gh._post_resource(('repos', self.owner.login,
-            self.name, 'downloads'), DownloadRessource, data=self._gh._resource_serialize(data), **params)
-        
-        curl_command = list();
-        curl_command.append('curl')
-        curl_command.append('-s')
-        curl_command.append('-F key='+dlressource.path)
-        curl_command.append('-F acl='+dlressource.acl)
-        curl_command.append('-F success_action_status=201')
-        curl_command.append('-F Filename='+dlressource.name)
-        curl_command.append('-F AWSAccessKeyId='+dlressource.accesskeyid)
-        curl_command.append('-F Policy='+dlressource.policy)
-        curl_command.append('-F Signature='+dlressource.signature)
-        curl_command.append('-F Content-Type='+dlressource.mime_type)
-        curl_command.append('-F file=@'+filepath+'')
-        curl_command.append('https://github.s3.amazonaws.com/')
-        import subprocess
-        p = subprocess.Popen(curl_command,
-            env=os.environ,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        out, err = p.communicate()
+                                               self.name, 'downloads'), 
+                                              DownloadRessource, 
+                                              data=self._gh._resource_serialize(data), 
+                                              **params)
+        form = {}
+        form['key'] = dlressource.path
+        form['acl'] = dlressource.acl
+        form['success_action_status'] = '201'
+        form['Filename'] = dlressource.name
+        form['AWSAccessKeyId'] = dlressource.accesskeyid
+        form['Policy'] = dlressource.policy
+        form['Signature'] = dlressource.signature
+        form['Content-Type'] = dlressource.mime_type
+
+        myfile = open(filepath)
+
+        files = {'file' :  myfile}
+
+        r = requests.post(settings.github_upload_file_url, data=form, files=files, **params)
         return dlressource;
 
 
