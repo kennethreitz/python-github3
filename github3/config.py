@@ -56,3 +56,4 @@ class Settings(object):
 settings = Settings()
 settings.verbose = False
 settings.base_url = 'https://api.github.com/'
+settings.github_upload_file_url = 'http://github.s3.amazonaws.com'
