@@ -102,7 +102,7 @@ class User(BaseResource):
         return '<user {0}>'.format(self.login)
 
     def repos(self, limit=None):
-        return self._gh._get_resources(('users', self.login, 'repos'), Repo)
+        return self._gh._get_resources(('users', self.login, 'repos'), Repo, limit=limit)
 
     def orgs(self):
         return self._gh._get_resources(('users', self.login, 'orgs'), Org)
@@ -126,7 +126,7 @@ class CurrentUser(User):
         return '<current-user {0}>'.format(self.login)
 
     def repos(self, limit=None):
-         return self._gh._get_resources(('user', 'repos'), Repo)
+         return self._gh._get_resources(('user', 'repos'), Repo, limit=limit)
 
     def orgs(self):
         return self._gh._get_resources(('user', 'orgs'), Org)
