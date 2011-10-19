@@ -25,6 +25,8 @@ class GithubCore(object):
     _rate_limit = None
     _rate_limit_remaining = None
 
+    def __init__(self):
+        self.session = requests.session()
 
     @staticmethod
     def _resource_serialize(o):
@@ -70,7 +72,7 @@ class GithubCore(object):
         return r
 
 
-    def _http_resource(self, verb, endpoint, params=None, authed=True):
+    def _http_resource(self, verb, endpoint, params=None, authed=True, **etc):
 
         url = self._generate_url(endpoint)
 
@@ -80,7 +82,9 @@ class GithubCore(object):
             args = (verb, url)
             kwargs = {'params': params}
 
-        r = requests.request(*args, **kwargs)
+        kwargs.update(etc)
+
+        r = self.session.request(*args, **kwargs)
         r = self._requests_post_hook(r)
 
         # print self._ratelimit_remaining
@@ -96,6 +100,12 @@ class GithubCore(object):
         item = self._resource_deserialize(r.content)
 
         return obj.new_from_dict(item, gh=self)
+
+    def _patch_resource(self, resource, data, authed=True, **kwargs):
+        r = self._http_resource('PATCH', resource, data=data, params=kwargs, authed=authed)
+        msg = self._resource_deserialize(r.content)
+
+        return msg
 
 
     def _get_resources(self, resource, obj, authed=True, **kwargs):
