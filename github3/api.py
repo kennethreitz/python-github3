@@ -55,9 +55,8 @@ class GithubCore(object):
         return (settings.base_url + resource)
 
 
-    def _requests_pre_hook(*args, **kwargs):
+    def _requests_pre_hook(self, *args, **kwargs):
         """Pre-processing for HTTP requests arguments."""
-
         return args, kwargs
 
 
@@ -70,21 +69,18 @@ class GithubCore(object):
         return r
 
 
-    def _http_resource(self, verb, endpoint, params=None, authed=True):
+    def _http_resource(self, verb, endpoint, data=None, params=None, authed=True):
 
         url = self._generate_url(endpoint)
-
         if authed:
-            args, kwargs = self._requests_pre_hook(verb, url, params=params)
+            args, kwargs = self._requests_pre_hook(verb, url, data=data, params=params)
         else:
             args = (verb, url)
-            kwargs = {'params': params}
-
+            kwargs = {'data': data, 'params': params}
         r = requests.request(*args, **kwargs)
         r = self._requests_post_hook(r)
 
         # print self._ratelimit_remaining
-
         r.raise_for_status()
 
         return r
@@ -109,6 +105,21 @@ class GithubCore(object):
             items.append(obj.new_from_dict(item, gh=self))
 
         return items
+
+
+    def _delete_resource(self, resource, authed=True, **kwargs):
+
+        r = self._http_resource('DELETE', resource, params=kwargs, authed=authed)
+
+        return True
+
+
+    def _post_resource(self, resource, obj, data=None, authed=True, **kwargs):
+
+        r = self._http_resource('POST', resource, data=data, params=kwargs, authed=authed)
+        item = self._resource_deserialize(r.content)
+
+        return obj.new_from_dict(item, gh=self)
 
 
     def _to_map(self, obj, iterable):
@@ -143,6 +154,9 @@ class Github(GithubCore):
         """Get a single user."""
         return self._get_resource(('users', username), User)
 
+    def get_org(self, orgname):
+        """Get a single organization."""
+        return self._get_resource(('orgs', orgname), Organization)
 
     def get_me(self):
         """Get the authenticated user."""
@@ -156,9 +170,9 @@ class Github(GithubCore):
         """Get the authenticated user."""
         return self._get_resource(('repos', username, reponame), Repo)
 
-    def get_org(self, login):
-        """Get organization."""
-        return self._get_resource(('orgs', login), Org)
+    def get_issues(self, username, reponame):
+        return self._get_resources(('repos', username, reponame, 'issues'),
+                Issue)
 
 
 class ResponseError(Exception):
