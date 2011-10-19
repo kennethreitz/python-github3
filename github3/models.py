@@ -59,6 +59,7 @@ class BaseResource(object):
             _gh = gh
         )
 
+
     def update(self):
         deploy = key_diff(self._cache, self.dict(), pack=True)
 
@@ -67,12 +68,6 @@ class BaseResource(object):
 
         r = self._gh._patch_resource(self.ri, deploy)
         return r
-
-
-
-    def setattr(self, k, v):
-        # TODO: when writable key changed,
-        pass
 
 
 class Plan(BaseResource):

@@ -27,6 +27,8 @@ class GithubCore(object):
 
     def __init__(self):
         self.session = requests.session()
+        self.session.params = {'per_page': 100}
+
 
     @staticmethod
     def _resource_serialize(o):
@@ -57,12 +59,6 @@ class GithubCore(object):
         return (settings.base_url + resource)
 
 
-    def _requests_pre_hook(*args, **kwargs):
-        """Pre-processing for HTTP requests arguments."""
-
-        return args, kwargs
-
-
     def _requests_post_hook(self, r):
         """Post-processing for HTTP response objects."""
 
@@ -72,17 +68,17 @@ class GithubCore(object):
         return r
 
 
-    def _http_resource(self, verb, endpoint, params=None, authed=True, **etc):
+    def _http_resource(self, verb, endpoint, params=None, **etc):
 
         url = self._generate_url(endpoint)
+        # print self.session.__dict__
 
-        if authed:
-            args, kwargs = self._requests_pre_hook(verb, url, params=params)
-        else:
-            args = (verb, url)
-            kwargs = {'params': params}
+        args = (verb, url)
+        kwargs = {'params': params}
 
         kwargs.update(etc)
+
+        print self.session.__dict__
 
         r = self.session.request(*args, **kwargs)
         r = self._requests_post_hook(r)
@@ -94,23 +90,23 @@ class GithubCore(object):
         return r
 
 
-    def _get_resource(self, resource, obj, authed=True, **kwargs):
+    def _get_resource(self, resource, obj, **kwargs):
 
-        r = self._http_resource('GET', resource, params=kwargs, authed=authed)
+        r = self._http_resource('GET', resource, params=kwargs)
         item = self._resource_deserialize(r.content)
 
         return obj.new_from_dict(item, gh=self)
 
-    def _patch_resource(self, resource, data, authed=True, **kwargs):
-        r = self._http_resource('PATCH', resource, data=data, params=kwargs, authed=authed)
+    def _patch_resource(self, resource, data, **kwargs):
+        r = self._http_resource('PATCH', resource, data=data, params=kwargs)
         msg = self._resource_deserialize(r.content)
 
         return msg
 
 
-    def _get_resources(self, resource, obj, authed=True, **kwargs):
+    def _get_resources(self, resource, obj, **kwargs):
 
-        r = self._http_resource('GET', resource, params=kwargs, authed=authed)
+        r = self._http_resource('GET', resource, params=kwargs)
         d_items = self._resource_deserialize(r.content)
 
         items = []
