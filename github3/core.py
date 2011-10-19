@@ -41,21 +41,21 @@ def basic_auth(username, password):
 
 
 
-def git_config():
-    """Returns an authenticated Github object, via HTTP Basic.
+# def git_config():
+#     """Returns an authenticated Github object, via HTTP Basic.
 
-    GitHub API token is taken from `git config`.
-    """
+#     GitHub API token is taken from `git config`.
+#     """
 
-    username = envoy.run('git config github.user').std_out.strip()
-    token = envoy.run('git config github.token').std_out.strip()
+#     username = envoy.run('git config github.user').std_out.strip()
+#     token = envoy.run('git config github.token').std_out.strip()
 
-    def enable_auth(*args, **kwargs):
-        kwargs['auth'] = (username, token)
-        return args, kwargs
+#     def enable_auth(*args, **kwargs):
+#         kwargs['auth'] = (username, token)
+#         return args, kwargs
 
-    gh = Github()
-    gh.is_authenticated = True
-    gh._requests_pre_hook = enable_auth
+#     gh = Github()
+#     gh.is_authenticated = True
+#     gh._requests_pre_hook = enable_auth
 
-    return gh
+#     return gh
