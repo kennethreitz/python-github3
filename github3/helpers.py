@@ -25,7 +25,7 @@ def is_collection(obj):
     return val
 
 
-def key_diff(source, update):
+def key_diff(source, update, pack=False):
     """Given two dictionaries, returns a list of the changed keys."""
 
     source = dict(source)
@@ -39,7 +39,15 @@ def key_diff(source, update):
         if (v != u_v) and (u_v is not None):
             changed.append(k)
 
-    return changed
+    if pack is False:
+        return changed
+
+    d = dict()
+
+    for k in changed:
+        d[k] = update[k]
+
+    return d
 
 
 # from arc90/python-readability-api
@@ -59,9 +67,11 @@ def to_python(obj,
     :param object_map: Dict of {key, obj} map, for nested object results.
     """
 
+    d = dict()
+
     if str_keys:
         for in_key in str_keys:
-            obj.__dict__[in_key] = in_dict.get(in_key)
+            d[in_key] = in_dict.get(in_key)
 
     if date_keys:
         for in_key in date_keys:
@@ -71,24 +81,29 @@ def to_python(obj,
             except TypeError:
                 out_date = None
 
-            obj.__dict__[in_key] = out_date
+            d[in_key] = out_date
 
     if int_keys:
         for in_key in int_keys:
             if (in_dict is not None) and (in_dict.get(in_key) is not None):
-                obj.__dict__[in_key] = int(in_dict.get(in_key))
+                d[in_key] = int(in_dict.get(in_key))
 
     if bool_keys:
         for in_key in bool_keys:
             if in_dict.get(in_key) is not None:
-                obj.__dict__[in_key] = bool(in_dict.get(in_key))
+                d[in_key] = bool(in_dict.get(in_key))
 
     if object_map:
         for (k, v) in object_map.items():
             if in_dict.get(k):
-                obj.__dict__[k] = v.new_from_dict(in_dict.get(k))
+                d[k] = v.new_from_dict(in_dict.get(k))
 
+    obj.__dict__.update(d)
     obj.__dict__.update(kwargs)
+
+    # Save the dictionary, for write comparisons.
+    obj._cache = d
+    obj.__cache = in_dict
 
     return obj
 
