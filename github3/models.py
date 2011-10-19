@@ -5,7 +5,9 @@ github3.models
 This module provides the Github3 object model.
 """
 
-from .helpers import to_python, to_api
+import json
+
+from .helpers import to_python, to_api, key_diff
 
 
 class BaseResource(object):
@@ -17,7 +19,7 @@ class BaseResource(object):
     _bools = []
     _map = {}
     _writeable = []
-    _modified = []
+    _cache = {}
 
 
     def __init__(self):
@@ -26,22 +28,23 @@ class BaseResource(object):
 
 
     def __dir__(self):
-        d = self.__dict__.copy()
-
-        try:
-            del d['_gh']
-        except KeyError:
-            pass
-
-        return d.keys()
-
+        return self.keys()
 
     def _bootstrap(self):
         """Bootstraps the model object based on configured values."""
 
-        for attr in (self._strs + self._ints + self._dates + self._bools + self._map.keys()):
+        for attr in self.keys():
             setattr(self, attr, None)
 
+    def keys(self):
+        return self._strs + self._ints + self._dates + self._bools + self._map.keys()
+
+    def dict(self):
+        d = dict()
+        for k in self.keys():
+            d[k] = self.__dict__.get(k)
+
+        return d
 
     @classmethod
     def new_from_dict(cls, d, gh=None):
@@ -57,11 +60,20 @@ class BaseResource(object):
         )
 
     def update(self):
-        pass
+        deploy = key_diff(self._cache, self.dict(), pack=True)
+
+        deploy = to_api(deploy, int_keys=self._ints, date_keys=self._dates, bool_keys=self._bools)
+        deploy = json.dumps(deploy)
+
+        r = self._gh._patch_resource(self.ri, deploy)
+        return r
+
+
 
     def setattr(self, k, v):
         # TODO: when writable key changed,
         pass
+
 
 class Plan(BaseResource):
     """Github Plan object model."""
@@ -87,6 +99,10 @@ class User(BaseResource):
     # _map = {}
     # _writeable = []
 
+    @property
+    def ri(self):
+        return ('users', self.login)
+
     def __repr__(self):
         return '<user {0}>'.format(self.login)
 
@@ -106,6 +122,10 @@ class CurrentUser(User):
         'disk_usage', 'collaborators']
     _map = {'plan': Plan}
     _writeable = ['name', 'email', 'blog', 'company', 'location', 'hireable', 'bio']
+
+    @property
+    def ri(self):
+        return ('user',)
 
     def __repr__(self):
         return '<current-user {0}>'.format(self.login)
@@ -146,6 +166,11 @@ class Repo(BaseResource):
     _ints = ['forks', 'watchers', 'size',]
     _dates = ['pushed_at', 'created_at']
     _map = {'owner': User}
+
+
+    @property
+    def ri(self):
+        return ('repos', self.owner.login, self.name)
 
     def __repr__(self):
         return '<repo {0}/{1}>'.format(self.owner.login, self.name)
