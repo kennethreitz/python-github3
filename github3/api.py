@@ -19,6 +19,7 @@ import requests
 
 from decorator import decorator
 
+PAGING_SIZE = 100
 
 class GithubCore(object):
 
@@ -27,7 +28,7 @@ class GithubCore(object):
 
     def __init__(self):
         self.session = requests.session()
-        self.session.params = {'per_page': 100}
+        self.session.params = {'per_page': PAGING_SIZE}
 
 
     @staticmethod
@@ -71,7 +72,6 @@ class GithubCore(object):
     def _http_resource(self, verb, endpoint, params=None, **etc):
 
         url = self._generate_url(endpoint)
-
         args = (verb, url)
 
         if params:
@@ -82,8 +82,6 @@ class GithubCore(object):
 
         r = self.session.request(*args, **kwargs)
         r = self._requests_post_hook(r)
-
-        # print self._ratelimit_remaining
 
         r.raise_for_status()
 
@@ -104,17 +102,68 @@ class GithubCore(object):
         return msg
 
 
-    def _get_resources(self, resource, obj, **kwargs):
+    @staticmethod
+    def _total_pages_from_header(link_header):
+        from urlparse import urlparse, parse_qs
+        page_info = {}
 
-        r = self._http_resource('GET', resource, params=kwargs)
-        d_items = self._resource_deserialize(r.content)
+        for link in link_header.split(','):
 
-        items = []
+            uri, meta = map(str.strip, link.split(';'))
 
-        for item in d_items:
-            items.append(obj.new_from_dict(item, gh=self))
+            # Strip <>'s
+            uri = uri[1:-1]
 
-        return items
+            # Get query params from header.
+            q = parse_qs(urlparse(uri).query)
+            meta = meta[5:-1]
+
+            page_info[meta] = q
+
+        try:
+            return int(page_info['last']['page'].pop())
+        except KeyError:
+            return True
+
+    def _get_resources(self, resource, obj, limit=None, **kwargs):
+
+        if limit is not None:
+            assert limit > 0
+
+        moar = True
+        is_truncated = (limit > PAGING_SIZE) or (limit is None)
+        r_count = 0
+        page = 1
+
+        while moar:
+
+            if not is_truncated:
+                kwargs['per_page'] = limit
+                moar = False
+            else:
+                kwargs['page'] = page
+                if limit:
+                    if (limit - r_count) < PAGING_SIZE:
+                        kwargs['per_page'] = (limit - r_count)
+                        moar = False
+
+
+            r = self._http_resource('GET', resource, params=kwargs)
+            max_page = self._total_pages_from_header(r.headers['link'])
+
+            if max_page is True:
+                moar = False
+
+            d_items = self._resource_deserialize(r.content)
+
+            for item in d_items:
+                if (r_count < limit) or (limit is None):
+                    r_count += 1
+                    yield obj.new_from_dict(item, gh=self)
+                else:
+                    moar = False
+
+            page += 1
 
 
     def _to_map(self, obj, iterable):
