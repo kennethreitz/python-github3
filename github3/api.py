@@ -7,6 +7,11 @@ github3.api
 This module provies the core GitHub3 API interface.
 """
 
+from urlparse import urlparse, parse_qs
+
+import requests
+from decorator import decorator
+
 from .packages import omnijson as json
 from .packages.link_header import parse_link_value
 
@@ -15,9 +20,7 @@ from .helpers import is_collection, to_python, to_api, get_scope
 from .config import settings
 
 
-import requests
 
-from decorator import decorator
 
 PAGING_SIZE = 100
 
@@ -69,7 +72,7 @@ class GithubCore(object):
         return r
 
 
-    def _http_resource(self, verb, endpoint, params=None, **etc):
+    def _http_resource(self, verb, endpoint, params=None, check_status=True, **etc):
 
         url = self._generate_url(endpoint)
         args = (verb, url)
@@ -83,7 +86,8 @@ class GithubCore(object):
         r = self.session.request(*args, **kwargs)
         r = self._requests_post_hook(r)
 
-        r.raise_for_status()
+        if check_status:
+            r.raise_for_status()
 
         return r
 
@@ -104,7 +108,10 @@ class GithubCore(object):
 
     @staticmethod
     def _total_pages_from_header(link_header):
-        from urlparse import urlparse, parse_qs
+
+        if link_header is None:
+            return link_header
+
         page_info = {}
 
         for link in link_header.split(','):
@@ -147,11 +154,10 @@ class GithubCore(object):
                         kwargs['per_page'] = (limit - r_count)
                         moar = False
 
-
             r = self._http_resource('GET', resource, params=kwargs)
             max_page = self._total_pages_from_header(r.headers['link'])
 
-            if max_page is True:
+            if (max_page is True) or (max_page is None):
                 moar = False
 
             d_items = self._resource_deserialize(r.content)
@@ -203,12 +209,8 @@ class Github(GithubCore):
         """Get the authenticated user."""
         return self._get_resource(('user'), CurrentUser)
 
-    # def get_repos(self, username):
-        # """Get repos."""
-         # return self._get_resource(('user', 'username', 'repos'), Repo)
-
     def get_repo(self, username, reponame):
-        """Get the authenticated user."""
+        """Get the given repo."""
         return self._get_resource(('repos', username, reponame), Repo)
 
     def get_org(self, login):

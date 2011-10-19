@@ -104,8 +104,12 @@ class User(BaseResource):
     def repos(self, limit=None):
         return self._gh._get_resources(('users', self.login, 'repos'), Repo, limit=limit)
 
+    def repo(self, reponame):
+         return self._gh._get_resource(('repos', self.login, reponame), Repo)
+
     def orgs(self):
         return self._gh._get_resources(('users', self.login, 'orgs'), Org)
+
 
 
 class CurrentUser(User):
@@ -128,8 +132,15 @@ class CurrentUser(User):
     def repos(self, limit=None):
          return self._gh._get_resources(('user', 'repos'), Repo, limit=limit)
 
-    def orgs(self):
-        return self._gh._get_resources(('user', 'orgs'), Org)
+    def repo(self, reponame):
+         return self._gh._get_resource(('repos', self.login, reponame), Repo)
+
+    def orgs(self, limit=None):
+        return self._gh._get_resources(('user', 'orgs'), Org,  limit=limit)
+
+    def org(self, orgname):
+        return self._gh._get_resource(('orgs', orgname), Org)
+
 
 
 class Org(BaseResource):
@@ -137,7 +148,7 @@ class Org(BaseResource):
 
     _strs = [
         'login', 'url', 'avatar_url', 'name', 'company', 'blog', 'location', 'email'
-        'html_url', 'type']
+        'html_url', 'type', 'billing_email']
     _ints = [
         'id', 'public_repos', 'public_gists', 'followers', 'following',
         'total_private_repos', 'owned_private_repos', 'private_gists', 'disk_usage',
@@ -146,11 +157,58 @@ class Org(BaseResource):
     _map = {'plan': Plan}
     _writable = ['billing_email', 'blog', 'company', 'email', 'location', 'name']
 
+    @property
+    def ri(self):
+        return ('orgs', self.login)
+
     def __repr__(self):
         return '<org {0}>'.format(self.login)
 
     def repos(self, limit=None):
-         return self._gh._get_resources(('orgs', self.login, 'repos'), Repo)
+         return self._gh._get_resources(('orgs', self.login, 'repos'), Repo, limit=limit)
+
+    def members(self, limit=None):
+        return self._gh._get_resources(('orgs', self.login, 'members'), User, limit=limit)
+
+    def is_member(self, username):
+        if isinstance(username, User):
+            username = username.login
+
+        r = self._gh._http_resource('GET', ('orgs', self.login, 'members', username), check_status=False)
+        return (r.status_code == 204)
+
+    def publicize_member(self, username):
+        if isinstance(username, User):
+            username = username.login
+
+        r = self._gh._http_resource('PUT', ('orgs', self.login, 'public_members', username), check_status=False, data='')
+        return (r.status_code == 204)
+
+    def conceal_member(self, username):
+        if isinstance(username, User):
+            username = username.login
+
+        r = self._gh._http_resource('DELETE', ('orgs', self.login, 'public_members', username), check_status=False)
+        return (r.status_code == 204)
+
+    def remove_member(self, username):
+        if isinstance(username, User):
+            username = username.login
+
+        r = self._gh._http_resource('DELETE', ('orgs', self.login, 'members', username), check_status=False)
+        return (r.status_code == 204)
+
+    def public_members(self, limit=None):
+        return self._gh._get_resources(('orgs', self.login, 'public_members'), User, limit=limit)
+
+    def is_public_member(self, username):
+        if isinstance(username, User):
+            username = username.login
+
+        r = self._gh._http_resource('GET', ('orgs', self.login, 'public_members', username), check_status=False)
+        return (r.status_code == 204)
+
+
 
 
 class Repo(BaseResource):
