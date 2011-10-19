@@ -1,4 +1,4 @@
-requests==0.6.5
+requests==0.6.6
 python-dateutil==2.0
 decorator==3.3.1
 envoy==0.0.2
