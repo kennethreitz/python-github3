@@ -71,14 +71,14 @@ class GithubCore(object):
     def _http_resource(self, verb, endpoint, params=None, **etc):
 
         url = self._generate_url(endpoint)
-        # print self.session.__dict__
 
         args = (verb, url)
-        kwargs = {'params': params}
 
-        kwargs.update(etc)
-
-        print self.session.__dict__
+        if params:
+            kwargs = {'params': params}
+            kwargs.update(etc)
+        else:
+            kwargs = etc
 
         r = self.session.request(*args, **kwargs)
         r = self._requests_post_hook(r)
