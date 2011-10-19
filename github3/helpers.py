@@ -25,6 +25,23 @@ def is_collection(obj):
     return val
 
 
+def key_diff(source, update):
+    """Given two dictionaries, returns a list of the changed keys."""
+
+    source = dict(source)
+    update = dict(update)
+
+    changed = []
+
+    for (k, v) in source.items():
+        u_v = update.get(k)
+
+        if (v != u_v) and (u_v is not None):
+            changed.append(k)
+
+    return changed
+
+
 # from arc90/python-readability-api
 def to_python(obj,
     in_dict,
