@@ -5,7 +5,7 @@
 import os
 import sys
 
-from . import github3
+import github3
 
 try:
     from setuptools import setup
