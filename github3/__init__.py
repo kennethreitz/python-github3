@@ -36,4 +36,4 @@ __version__ = '0.0.1'
 
 # Module namespace.
 
-from .core import from_pass
+from .core import login
