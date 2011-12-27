@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """
-heroku.api
+github3.api
 ~~~~~~~~~~
 
-This module provides the basic API interface for Heroku.
+This module provides the basic API interface for Github.
 """
 
 import json
@@ -18,7 +18,7 @@ GITHUB_URL = 'https://api.github.com'
 
 
 class GithubCore(object):
-    """The core Heroku class."""
+    """The core Github class."""
     def __init__(self):
         super(GithubCore, self).__init__()
 
@@ -32,10 +32,10 @@ class GithubCore(object):
         self._s.headers.update({'Accept': 'application/json'})
 
     def __repr__(self):
-        return '<heroku-core at 0x%x>' % (id(self))
+        return '<github-core at 0x%x>' % (id(self))
 
     def login(self, username, password):
-        """Logs user into Heroku with given api_key."""
+        """Logs user into Github with given credentials."""
 
         # Attach auth to session.
         self._s.auth = (username.password)
@@ -51,7 +51,7 @@ class GithubCore(object):
 
     def _url_for(self, *args):
         args = map(str, args)
-        return '/'.join([self._heroku_url] + list(args))
+        return '/'.join([self._github_url] + list(args))
 
     @staticmethod
     def _resource_serialize(o):
@@ -76,7 +76,6 @@ class GithubCore(object):
         url = self._url_for(*resource)
         r = self._s.request(method, url, params=params, data=data)
 
-        # TODO: check heroku's status codes
         r.raise_for_status()
 
         return r
