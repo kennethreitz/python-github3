@@ -157,7 +157,7 @@ class App(BaseResource):
 
     @property
     def processes(self):
-        """The proccesses for this app."""
+        """The processes for this app."""
         return self._h._get_resources(
             resource=('apps', self.name, 'ps'),
             obj=Process, app=self, map=ProcessListResource

@@ -4,7 +4,7 @@
 github3.helpers
 ~~~~~~~~~~~~~~~
 
-This module contians the helpers.
+This module contains the helpers.
 """
 
 from datetime import datetime
